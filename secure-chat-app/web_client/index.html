@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Secure Chat App</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <h2>🔐 <b>Secure Chat App</b></h2>
+
+  <div id="login-section">
+    <input type="text" id="userInput" placeholder="Enter your username" />
+    <button id="loginBtn">Login</button>
+  </div>
+
+  <div id="chat-setup" style="display:none;">
+    <p>Logged in as <span id="loggedUser"></span></p>
+    <input type="text" id="receiverInput" placeholder="Enter friend’s username" />
+    <button id="sendRequestBtn">Send Chat Request</button>
+  </div>
+
+  <div id="chatBox" style="display:none;">
+    <div id="chatWindow" style="border: 1px solid #ccc; height: 200px; overflow-y: auto; margin-bottom: 10px;"></div>
+    <input type="text" id="msgInput" placeholder="Type your message" />
+    <button id="sendBtn">Send</button>
+  </div>
+
+  <p id="status"></p>
+
+  <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
