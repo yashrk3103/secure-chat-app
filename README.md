@@ -39,13 +39,13 @@ A responsive and real-time web-based chat application built with **Flask**, **So
 
 ## 🧩 Tech Stack
 
-| Layer     | Tech                            |
-|-----------|----------------------------------|
-| Frontend  | HTML, CSS (Tailwind), JS (Web Crypto) |
-| Backend   | Python (Flask), Flask-SocketIO  |
-| Auth      | SQLite + session login          |
-| Security  | RSA (Key Exchange), AES-GCM     |
-| Real-Time | WebSockets via Socket.IO        |
+| Layer     | Tech                               |
+|-----------|------------------------------------|
+| Frontend  | HTML, Tailwind CSS, JS (Web Crypto)|
+| Backend   | Python (Flask), Flask-SocketIO     |
+| Auth      | SQLite + Flask session             |
+| Security  | RSA (Key Exchange), AES-GCM        |
+| Real-Time | WebSockets via Socket.IO           |
 
 ---
 
@@ -56,26 +56,37 @@ A responsive and real-time web-based chat application built with **Flask**, **So
 ```bash
 git clone https://github.com/yashrk3103/secure-chat-app.git
 cd secure-chat-app
+```
 
----
-🐍 2. Setup Python Backend
+### 🐍 2. Setup Python Backend
+
+```bash
 python -m venv .venv
-# Activate:
+
+# Activate virtual environment:
 # On Windows:
 .venv\Scripts\activate
+
 # On Mac/Linux:
 source .venv/bin/activate
 
+# Install dependencies
 pip install -r requirements.txt
+```
 
----
+### ▶️ 3. Run Flask App
 
-▶️ 3. Run Flask App
+```bash
 python secure-chat-app/server/server.py
+```
+
+Visit the app at: `http://localhost:5000`
 
 ---
 
-📁 Project Structure
+## 📁 Project Structure
+
+```
 secure-chat-app/
 ├── client/
 ├── server/
@@ -98,32 +109,35 @@ secure-chat-app/
 │       ├── mobile_chat.jpg
 ├── requirements.txt
 └── README.md
+```
 
 ---
 
-🔒 How Encryption Works
+## 🔒 How Encryption Works
 
-* **Login/Registration**: Users log in with a secure username-password pair.
-* **Key Pair Generation**: On login, a public/private RSA key pair is generated in-browser.
-* **AES Key Exchange**: When two users connect, a random AES key is generated and securely shared using RSA.
-* **Chat**: Messages are encrypted using AES-GCM in the sender's browser and decrypted only in the receiver's browser.
+- **Login/Registration**: Users log in with a secure username-password pair.
+- **Key Pair Generation**: On login, a public/private RSA key pair is generated in-browser.
+- **AES Key Exchange**: When two users connect, a random AES key is generated and securely shared using RSA.
+- **Chat**: Messages are encrypted using AES-GCM in the sender's browser and decrypted only in the receiver's browser.
 
 ---
 
 ## 🧪 Testing Tips
 
-* ✅ Test on **two different browsers or devices**
-* ✅ For same-browser (tabs), use **unique usernames** per tab
-* ✅ Mobile-friendly via tunneling (like `devtunnels`, `ngrok`, etc.)
-* ✅ Works on desktop and Android browsers
+- ✅ Test on **two different browsers or devices**
+- ✅ For same-browser (tabs), use **unique usernames** per tab
+- ✅ Mobile-friendly via tunneling tools (like `devtunnels`, `ngrok`, etc.)
+- ✅ Works on both desktop and Android browsers
 
 ---
 
 ## 📌 Future Improvements
 
-* Message history per chat (local storage or encrypted DB)
-* Notification for incoming requests/messages
-* Online user presence indicators
-* Admin panel for log review (secured)
+- Message history per chat (local storage or encrypted DB)
+- Notification for incoming requests/messages
+- Online user presence indicators
+- Admin panel for log review (secured)
 
 ---
+
+> Built with ❤️ by **Yash Khunt** as part of Cyber Security Internship @ **Elevate Labs**
