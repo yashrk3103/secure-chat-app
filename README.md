@@ -99,3 +99,31 @@ secure-chat-app/
 ├── requirements.txt
 └── README.md
 
+---
+
+🔒 How Encryption Works
+
+* **Login/Registration**: Users log in with a secure username-password pair.
+* **Key Pair Generation**: On login, a public/private RSA key pair is generated in-browser.
+* **AES Key Exchange**: When two users connect, a random AES key is generated and securely shared using RSA.
+* **Chat**: Messages are encrypted using AES-GCM in the sender's browser and decrypted only in the receiver's browser.
+
+---
+
+## 🧪 Testing Tips
+
+* ✅ Test on **two different browsers or devices**
+* ✅ For same-browser (tabs), use **unique usernames** per tab
+* ✅ Mobile-friendly via tunneling (like `devtunnels`, `ngrok`, etc.)
+* ✅ Works on desktop and Android browsers
+
+---
+
+## 📌 Future Improvements
+
+* Message history per chat (local storage or encrypted DB)
+* Notification for incoming requests/messages
+* Online user presence indicators
+* Admin panel for log review (secured)
+
+---
