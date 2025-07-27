@@ -113,3 +113,38 @@ p#status {
         width: 95%;
     }
 }
+
+
+/* Make sure chatBox fills available height on mobile */
+#chatBox {
+  flex: 1;
+  overflow-y: auto;
+  transition: height 0.3s ease;
+  min-height: 150px;
+}
+
+/* Improve mobile responsiveness */
+@media (max-width: 600px) {
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #chatBox {
+    min-height: 150px;
+    max-height: 50vh; /* ensure visible when keyboard opens */
+  }
+
+  .input-area {
+    position: sticky;
+    bottom: 0;
+    background-color: #1e1e1e;
+    z-index: 10;
+  }
+}

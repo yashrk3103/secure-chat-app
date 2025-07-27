@@ -9,10 +9,11 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 WEB_DIR = os.path.join(BASE_DIR, 'web_client')
 
 app = Flask(__name__, static_folder=WEB_DIR, template_folder=WEB_DIR)
-app.config['SECRET_KEY'] = '7e822abfba9076b4ef62cff581d75edb8255d3710fc4a67f22ca3430b001f7cb'
+app.config['SECRET_KEY'] = '455c61110a81b963450176b5721206b0edb93c5ea0523ea9d11598aeac22d0d9'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 connected_users = {}  # username -> sid
+user_credentials = {}  # username -> password
 active_chats = {}     # username -> room
 
 @app.route('/')
@@ -26,15 +27,23 @@ def serve_static(path):
 @socketio.on("register_user")
 def register_user(data):
     username = data.get("username")
+    password = data.get("password")
+
+    # Register if not exists
+    if username not in user_credentials:
+        user_credentials[username] = password
+        print(f"🔐 Registered new user: {username}")
+    elif user_credentials[username] != password:
+        emit("status", {"msg": "❌ Incorrect password."})
+        return
+
     connected_users[username] = request.sid
     print(f"✅ {username} connected with SID {request.sid}")
-    print("Current users:", connected_users)
 
 @socketio.on("chat_request")
 def chat_request(data):
     sender = data["sender"]
     recipient = data["recipient"]
-    print(f"📨 {sender} wants to chat with {recipient}")
     if recipient == sender:
         emit("status", {"msg": "You cannot chat with yourself."}, to=request.sid)
         return
@@ -58,7 +67,6 @@ def accept_chat(data):
     active_chats[to_user] = room
     emit("chat_accepted", {"room": room}, to=connected_users[from_user])
     emit("chat_accepted", {"room": room}, to=connected_users[to_user])
-    print(f"✅ Chat started in room {room} between {from_user} and {to_user}")
 
 @socketio.on("decline_chat")
 def decline_chat(data):
@@ -72,7 +80,6 @@ def private_message(data):
     room = data["room"]
     sender = data["sender"]
     msg = data["msg"]
-    print(f"💬 [{room}] {sender}: {msg}")
     emit("receive_private_message", {"sender": sender, "msg": msg}, room=room)
 
 @socketio.on('disconnect')
@@ -82,11 +89,10 @@ def handle_disconnect():
         if sid == disconnected_sid:
             print(f"❌ {username} disconnected")
             del connected_users[username]
-            # Remove from active_chats and notify the other user
             if username in active_chats:
                 room = active_chats[username]
-                for user, r in list(active_chats.items()):
-                    if r == room:
+                for user in list(active_chats):
+                    if active_chats[user] == room:
                         del active_chats[user]
                 emit("status", {"msg": f"{username} has left the chat."}, room=room)
             break

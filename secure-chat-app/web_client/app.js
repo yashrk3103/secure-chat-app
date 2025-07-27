@@ -1,9 +1,17 @@
-if (!sessionStorage.getItem("username")) {
-  window.location.href = "/login.html";
+// Prompt user for username if not set
+let username = sessionStorage.getItem("username");
+if (!username) {
+  username = prompt("Enter your username for this tab:");
+  if (!username || username.trim().length < 1) {
+    alert("Username is required.");
+    window.location.href = "/login.html";
+  } else {
+    username = username.trim();
+    sessionStorage.setItem("username", username);
+  }
 }
 
 const socket = io();
-const username = sessionStorage.getItem("username");
 let currentRoom = "";
 
 document.getElementById("userLabel").innerText = `You: ${username}`;
@@ -44,8 +52,8 @@ chatRequestBtn.onclick = () => {
 // Incoming chat request
 socket.on("incoming_chat_request", (data) => {
   if (currentRoom) return;
-  const confirmed = confirm(`${data.from} wants to chat. Accept?`);
-  if (confirmed) {
+  const confirmChat = confirm(`${data.from} wants to chat. Accept?`);
+  if (confirmChat) {
     socket.emit("accept_chat", { from: data.from, to: username });
     statusEl.innerText = `✅ Chat accepted. Connecting...`;
   } else {
@@ -82,7 +90,7 @@ sendBtn.onclick = () => {
   }
 };
 
-// Press Enter to send message
+// Press Enter to send
 messageInput.addEventListener("keydown", function (e) {
   if (e.key === "Enter") sendBtn.click();
 });
@@ -92,7 +100,7 @@ socket.on("receive_private_message", (data) => {
   appendMessage(data.sender, data.msg);
 });
 
-// Server status messages
+// Status updates
 socket.on("status", (data) => {
   statusEl.innerText = data.msg;
   if (data.msg.includes("not online") || data.msg.includes("declined")) {
@@ -101,10 +109,28 @@ socket.on("status", (data) => {
   }
 });
 
-// Append message to chat box
+// Display message
 function appendMessage(sender, msg) {
   const p = document.createElement("p");
   p.innerHTML = `<strong>${sender}:</strong> ${msg}`;
   chatBox.appendChild(p);
   chatBox.scrollTop = chatBox.scrollHeight;
+  chatBox.scrollIntoView({ behavior: "smooth", block: "end" });
 }
+
+
+document.getElementById("logoutBtn").onclick = function logout() {
+  sessionStorage.clear();
+  window.location.href = "/login.html";
+};
+
+window.onload = () => {
+  const chatBox = document.getElementById("chatBox");
+  const messageInput = document.getElementById("messageInput");
+
+  messageInput.addEventListener("focus", () => {
+    setTimeout(() => {
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }, 300); // delay ensures keyboard is fully opened
+  });
+};

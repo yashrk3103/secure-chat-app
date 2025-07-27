@@ -3,26 +3,120 @@
 <head>
   <meta charset="UTF-8" />
   <title>Secure Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+  <style>
+    html, body {
+      height: 100dvh; /* Use dynamic viewport for mobile keyboard */
+      margin: 0;
+    }
+    #chatContainer {
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+    #chatBox {
+      flex: 1;
+      overflow-y: auto;
+      scroll-padding-bottom: 5rem;
+      padding-bottom: 1rem;
+    }
+  </style>
 </head>
-<body class="bg-gray-900 text-white h-screen flex flex-col">
-  <div class="max-w-3xl mx-auto p-4 w-full flex-1 flex flex-col">
+<body class="bg-gray-900 text-white" id="chatContainer">
+
+  <div class="flex flex-col w-full max-w-3xl mx-auto p-4 h-full">
+    
+    <!-- Header -->
     <div class="flex justify-between items-center mb-4">
       <h1 class="text-lg font-semibold">🔐 Secure Chat</h1>
-      <span id="userLabel" class="text-sm text-gray-300"></span>
+      <div class="flex items-center gap-3 text-sm">
+        <span id="userLabel" class="text-gray-300"></span>
+        <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded">Logout</button>
+      </div>
     </div>
-    <div class="flex gap-2 mb-4">
+
+    <!-- Chat Setup -->
+    <div class="flex flex-col sm:flex-row gap-2 mb-4">
       <input id="receiver" class="flex-1 bg-gray-700 rounded px-3 py-2" placeholder="Enter friend's username">
       <button id="chatRequestBtn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">Send Request</button>
     </div>
+
     <div id="status" class="text-green-400 text-sm mb-2"></div>
-    <div id="chatBox" class="bg-gray-800 rounded p-4 flex-1 overflow-y-auto mb-4"></div>
-    <div class="flex gap-2">
-      <input id="messageInput" class="flex-1 bg-gray-700 rounded px-3 py-2" placeholder="Type message...">
-      <button id="sendBtn" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded">Send</button>
+
+    <div id="chatBox"
+     class="flex-1 bg-gray-800 rounded p-4 overflow-y-auto mb-4 space-y-2"
+     style="scroll-behavior: smooth;">
+</div>
+
+
+    <!-- Message Input Area -->
+    <div class="sticky bottom-0 bg-gray-900 p-4 z-10">
+      <div class="flex gap-2">
+        <input id="messageInput" class="flex-1 bg-gray-700 rounded px-3 py-2" placeholder="Type message..." />
+        <button id="sendBtn" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded">Send</button>
+      </div>
     </div>
+
   </div>
+
+  <!-- Scripts -->
   <script src="app.js"></script>
+  <script>
+    const chatBox = document.getElementById("chatBox");
+    const messageInput = document.getElementById("messageInput");
+    const socket = io(); // Assuming your Socket.IO server is set up
+
+    function scrollChatToBottom() {
+      chatBox.scrollTo({
+        top: chatBox.scrollHeight,
+        behavior: "smooth"
+      });
+    }
+
+    // Message rendering helper
+    function addMessageToChatBox(text, sender) {
+      const message = document.createElement("div");
+      message.textContent = `${sender}: ${text}`;
+      message.className = "bg-gray-700 px-3 py-2 rounded";
+      chatBox.appendChild(message);
+      scrollChatToBottom(); // Ensure latest message is visible
+    }
+
+    // Incoming messages from server
+    socket.on("receiveMessage", (data) => {
+      addMessageToChatBox(data.text, data.sender);
+    });
+
+    // Message send handler
+    document.getElementById("sendBtn").addEventListener("click", () => {
+      const text = messageInput.value.trim();
+      const receiver = document.getElementById("receiver").value.trim();
+      if (text) {
+        socket.emit("sendMessage", { text, receiver });
+        addMessageToChatBox(text, "You");
+        messageInput.value = "";
+      }
+    });
+
+    // Scroll on input focus (especially for mobile keyboard)
+    messageInput.addEventListener("focus", () => {
+      setTimeout(scrollChatToBottom, 300);
+    });
+
+    // Adjust scroll on window resize
+    window.addEventListener("resize", () => {
+      scrollChatToBottom();
+    });
+
+    // Logout logic
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      sessionStorage.clear();
+      window.location.href = "/login.html";
+    });
+  </script>
+  
+
 </body>
 </html>
